@@ -180,19 +180,21 @@ export const CustomTable = () => {
   return (
     <Table
       aria-label="table with custom cells, pagination and sorting"
-      isHeaderSticky
       bottomContent={bottomContent}
       bottomContentPlacement="outside"
-      classNames={{
-        wrapper: 'max-h-[582px]',
-      }}
+      isHeaderSticky
+      isStriped
+      layout="fixed"
+      onSelectionChange={setSelectedKeys}
+      onSortChange={setSortDescriptor}
       selectedKeys={selectedKeys}
       selectionMode="multiple"
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
+      classNames={{
+        wrapper: 'max-h-[582px]',
+      }}
     >
       <TableHeader columns={headerColumns}>
         {(column) => (
