@@ -14,7 +14,7 @@ export const useQueryCategory = () => {
 
 export const usePostCategory = () => {
   const queryClient = useQueryClient();
-  const { isError, mutate } = useMutation({
+  const postCategory = useMutation({
     mutationFn: (categoryForm: CategoryForm) =>
       CategoriesService.createCategory(categoryForm),
     onMutate: async () => {
@@ -33,5 +33,27 @@ export const usePostCategory = () => {
     },
   });
 
-  return { isError, mutate };
+  return postCategory;
+};
+
+export const useDeleteCategory = () => {
+  const queryClient = useQueryClient();
+  const deleteCategory = useMutation({
+    mutationFn: (id: number) => CategoriesService.deleteCategory(id),
+    onMutate: async () => {
+      toast.loading('Eliminando categoria...');
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success(data);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      toast.dismiss();
+    },
+  });
+
+  return deleteCategory;
 };

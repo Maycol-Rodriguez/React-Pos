@@ -6,3 +6,8 @@ export interface Category {
   updated_at?: string;
   actions?: string;
 }
+
+// TODO: Verificar estructura de respuesta a las mutaciones
+export interface CategoryResponse {
+  mensaje: string;
+}
