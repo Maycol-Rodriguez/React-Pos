@@ -1,5 +1,6 @@
 import { routes } from '@/shared/routes';
 import { NavLink, Outlet } from 'react-router-dom';
+import { Toaster } from 'sonner';
 
 export const AppLayout = () => {
   return (
@@ -250,6 +251,15 @@ export const AppLayout = () => {
         </nav>
         <div>
           <Outlet />
+          <Toaster
+            richColors
+            duration={2000}
+            position="top-right"
+            visibleToasts={4}
+            toastOptions={{
+              className: 'rounded-sm',
+            }}
+          />
         </div>
       </div>
     </div>
