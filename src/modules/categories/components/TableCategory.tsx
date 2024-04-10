@@ -5,6 +5,11 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Pagination,
   Table,
   TableBody,
@@ -12,6 +17,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  useDisclosure,
 } from '@nextui-org/react';
 
 import {
@@ -21,12 +27,18 @@ import {
   IoSearch,
 } from 'react-icons/io5';
 
-import { useTableCategory } from '@/categories/hooks';
-import { CategoryRes } from '@/categories/interfaces';
+import { usePostCategory, useTableCategory } from '@/categories/hooks';
+import { Category } from '@/categories/interfaces';
+import { CategoryForm, CategorySchema } from '@/categories/schemas';
 import { capitalize } from '@/shared/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Key, useCallback, useMemo } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 
 export const TableCategory = () => {
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { mutate } = usePostCategory();
+
   const {
     categories,
     columnsTable,
@@ -49,8 +61,24 @@ export const TableCategory = () => {
     visibleColumns,
   } = useTableCategory();
 
-  const renderCell = useCallback((category: CategoryRes, columnKey: Key) => {
-    const cellValue = category[columnKey as keyof CategoryRes];
+  const { control, reset, handleSubmit } = useForm<CategoryForm>({
+    defaultValues: {
+      nombre: 'demo',
+      descripcion: 'demo description',
+    },
+    resolver: zodResolver(CategorySchema),
+  });
+
+  const formSubmit: SubmitHandler<CategoryForm> = useCallback(
+    (data: CategoryForm) => {
+      mutate(data);
+      reset();
+    },
+    [mutate, reset],
+  );
+
+  const renderCell = useCallback((category: Category, columnKey: Key) => {
+    const cellValue = category[columnKey as keyof Category];
 
     switch (columnKey) {
       case 'nombre':
@@ -119,9 +147,63 @@ export const TableCategory = () => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<IoAdd size={22} />}>
+            <Button
+              onPress={onOpen}
+              color="primary"
+              endContent={<IoAdd size={22} />}
+            >
               Crear Nueva
             </Button>
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+              <ModalContent>
+                {(onClose) => (
+                  <>
+                    <form
+                      onSubmit={handleSubmit(formSubmit)}
+                      className="flex w-full flex-col flex-wrap gap-4 md:flex-nowrap"
+                    >
+                      <ModalHeader className="flex flex-col gap-1">
+                        Crear Categoria
+                      </ModalHeader>
+                      <ModalBody>
+                        <Controller
+                          name="nombre"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              size="lg"
+                              labelPlacement="outside"
+                              label="Nombre"
+                              placeholder="Nombre de la categoria"
+                            />
+                          )}
+                        />
+
+                        <Controller
+                          name="descripcion"
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              size="lg"
+                              labelPlacement="outside"
+                              label="Descripcion"
+                              placeholder="Descripcion de la categoria"
+                            />
+                          )}
+                        />
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button type="submit" color="primary" onPress={onClose}>
+                          crear
+                        </Button>
+                      </ModalFooter>
+                    </form>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
           </div>
         </div>
         <div className="flex items-center justify-between">
@@ -149,9 +231,15 @@ export const TableCategory = () => {
     visibleColumns,
     setVisibleColumns,
     columnsTable,
+    onOpen,
+    isOpen,
+    onOpenChange,
     categories.length,
     onRowsPerPageChange,
     onClear,
+    handleSubmit,
+    formSubmit,
+    control,
   ]);
 
   const bottomContent = useMemo(() => {
