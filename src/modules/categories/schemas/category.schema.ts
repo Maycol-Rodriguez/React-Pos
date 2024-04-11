@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const CategorySchema = z.object({
+  id: z.number().optional(),
   nombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   descripcion: z
     .string()
