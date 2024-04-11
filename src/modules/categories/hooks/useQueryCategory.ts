@@ -57,3 +57,26 @@ export const useDeleteCategory = () => {
 
   return deleteCategory;
 };
+
+export const useUpdateCategory = () => {
+  const queryClient = useQueryClient();
+  const updateCategory = useMutation({
+    mutationFn: (data: { id: number; category: CategoryForm }) =>
+      CategoriesService.updateCategory(data.id, data.category),
+    onMutate: async () => {
+      toast.loading('Actualizando categoria...');
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      toast.success(data);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      toast.dismiss();
+    },
+  });
+
+  return updateCategory;
+};
