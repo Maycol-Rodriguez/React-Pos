@@ -42,4 +42,16 @@ export class CategoriesService {
       throw new Error('Ocurrió un error al eliminar la categoría');
     }
   };
+
+  static updateCategory = async (id: number, category: CategoryForm): Promise<string> => {
+    try {
+      const { data } = await http.put<CategoryResponse>(`/categorias/${id}`, category);
+      return data.mensaje;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        throw new Error(error.response?.data.message);
+      }
+      throw new Error('Ocurrió un error al actualizar la categoría');
+    }
+  }
 }
