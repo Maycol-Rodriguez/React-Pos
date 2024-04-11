@@ -24,7 +24,12 @@ export const CustomModal = ({
   const postCategory = usePostCategory();
   const updateCategory = useUpdateCategory();
 
-  const { control, reset, handleSubmit } = useForm<CategoryForm>({
+  const {
+    control,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<CategoryForm>({
     resolver: zodResolver(CategorySchema),
     defaultValues: { nombre: '', descripcion: '' },
   });
@@ -84,10 +89,14 @@ export const CustomModal = ({
                 render={({ field }) => (
                   <Input
                     {...field}
-                    size="lg"
-                    labelPlacement="outside"
+                    autoFocus
+                    color={errors.nombre ? 'danger' : 'default'}
+                    errorMessage={errors.nombre?.message}
                     label="Nombre"
+                    labelPlacement="outside"
                     placeholder="Nombre de la categoria"
+                    size="lg"
+                    variant={errors.nombre ? 'bordered' : 'flat'}
                   />
                 )}
               />
@@ -98,10 +107,13 @@ export const CustomModal = ({
                 render={({ field }) => (
                   <Input
                     {...field}
-                    size="lg"
-                    labelPlacement="outside"
+                    color={errors.descripcion ? 'danger' : 'default'}
+                    errorMessage={errors.descripcion?.message}
                     label="Descripcion"
+                    labelPlacement="outside"
                     placeholder="Descripcion de la categoria"
+                    size="lg"
+                    variant={errors.descripcion ? 'bordered' : 'flat'}
                   />
                 )}
               />

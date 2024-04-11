@@ -1,8 +1,10 @@
 import { routes } from '@/shared/routes';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 
 export const AppLayout = () => {
+  const { pathname } = useLocation();
+
   return (
     <div className="min-h-screen bg-gray-50/50">
       <aside className="fixed inset-0 z-50 h-[calc(100vh)] w-72 -translate-x-80 rounded-r-md bg-gradient-to-br from-gray-800 to-gray-900 transition-transform duration-300 xl:translate-x-0">
@@ -125,27 +127,16 @@ export const AppLayout = () => {
                   </li>
                   <li className="flex cursor-pointer items-center font-sans text-sm font-normal leading-normal text-blue-900 antialiased transition-colors duration-300 hover:text-blue-500">
                     <p className="text-blue-gray-900 block font-sans text-sm font-normal leading-normal antialiased">
-                      home
+                      {pathname.split('/', 2)}
                     </p>
                   </li>
                 </ol>
               </nav>
-              <h6 className="block font-sans text-base font-semibold leading-relaxed tracking-normal text-gray-900 antialiased">
-                home
+              <h6 className="my-4 block font-sans text-2xl font-semibold leading-relaxed tracking-normal text-gray-900 antialiased">
+                {pathname.split('/', 2)}
               </h6>
             </div>
             <div className="flex items-center">
-              <div className="mr-auto md:mr-4 md:w-56">
-                <div className="relative h-10 w-full min-w-[200px]">
-                  <input
-                    className="disabled:bg-blue-gray-50 placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 border-blue-gray-200 peer h-full w-full rounded-[7px] border border-t-transparent bg-transparent px-3 py-2.5 font-sans text-sm font-normal text-gray-700 outline outline-0 transition-all placeholder-shown:border focus:border-2 focus:border-blue-500 focus:border-t-transparent focus:outline-0 disabled:border-0"
-                    placeholder=" "
-                  />
-                  <label className="peer-disabled:peer-placeholder-shown:text-blue-gray-500 before:content[' '] after:content[' '] text-blue-gray-400 before:border-blue-gray-200 after:border-blue-gray-200 pointer-events-none absolute -top-1.5 left-0 flex h-full w-full select-none text-[11px] font-normal leading-tight transition-all before:pointer-events-none before:mr-1 before:mt-[6.5px] before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-l before:border-t before:transition-all after:pointer-events-none after:ml-1 after:mt-[6.5px] after:box-border after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-r after:border-t after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-gray-500 peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px] peer-focus:leading-tight peer-focus:text-blue-500 peer-focus:before:border-l-2 peer-focus:before:border-t-2 peer-focus:before:border-blue-500 peer-focus:after:border-r-2 peer-focus:after:border-t-2 peer-focus:after:border-blue-500 peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent">
-                    Type here
-                  </label>
-                </div>
-              </div>
               <button
                 className="middle none hover:bg-blue-gray-500/10 active:bg-blue-gray-500/30 relative grid h-10 max-h-[40px] w-10 max-w-[40px] rounded-lg text-center font-sans text-xs font-medium uppercase text-gray-500 transition-all disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none xl:hidden"
                 type="button"
