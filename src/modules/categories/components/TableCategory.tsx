@@ -5,11 +5,6 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   Pagination,
   Table,
   TableBody,
@@ -27,23 +22,21 @@ import {
   IoSearch,
 } from 'react-icons/io5';
 
-import {
-  useDeleteCategory,
-  usePostCategory,
-  useTableCategory,
-} from '@/categories/hooks';
-
+import { CustomModal } from '@/categories/components';
+import { useDeleteCategory, useTableCategory } from '@/categories/hooks';
 import { Category } from '@/categories/interfaces';
-import { CategoryForm, CategorySchema } from '@/categories/schemas';
+import { CategoryForm } from '@/categories/schemas';
 import { capitalize } from '@/shared/utils';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Key, useCallback, useMemo } from 'react';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Key, useCallback, useMemo, useState } from 'react';
 
 export const TableCategory = () => {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const postCategory = usePostCategory();
   const deleteCategory = useDeleteCategory();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+  const [category, setCategory] = useState<CategoryForm>({
+    nombre: '',
+    descripcion: '',
+  });
 
   const {
     categories,
@@ -67,29 +60,13 @@ export const TableCategory = () => {
     visibleColumns,
   } = useTableCategory();
 
-  const { control, reset, handleSubmit } = useForm<CategoryForm>({
-    defaultValues: {
-      nombre: 'demo',
-      descripcion: 'demo description',
-    },
-    resolver: zodResolver(CategorySchema),
-  });
-
-  const formSubmit: SubmitHandler<CategoryForm> = useCallback(
-    (data: CategoryForm) => {
-      postCategory.mutate(data);
-      reset();
-    },
-    [postCategory, reset],
-  );
-
   const renderCell = useCallback(
     (category: Category, columnKey: Key) => {
       const cellValue = category[columnKey as keyof Category];
 
       switch (columnKey) {
         case 'nombre':
-          return <span>{category.nombre}</span>;
+          return category.nombre;
         case 'descripcion':
           return category.descripcion;
         case 'actions':
@@ -108,7 +85,21 @@ export const TableCategory = () => {
                   <DropdownItem onClick={() => console.log('Ver', category.id)}>
                     ver
                   </DropdownItem>
-                  <DropdownItem>Editar</DropdownItem>
+                  <DropdownItem
+                    onPress={() => {
+                      if (!category.id) return;
+
+                      setCategory({
+                        id: category.id,
+                        nombre: category.nombre,
+                        descripcion: category.descripcion,
+                      });
+
+                      onOpen();
+                    }}
+                  >
+                    Editar
+                  </DropdownItem>
                   <DropdownItem
                     onPress={() => {
                       deleteCategory.mutate(category.id);
@@ -124,140 +115,100 @@ export const TableCategory = () => {
           return cellValue;
       }
     },
-    [deleteCategory],
+    [deleteCategory, onOpen, setCategory],
   );
 
   const topContent = useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
-        <div className="flex items-end justify-between gap-3">
-          <Input
-            isClearable
-            className="w-full sm:max-w-[44%]"
-            placeholder="Buscar categorias"
-            startContent={<IoSearch size={20} />}
-            value={filterValue}
-            onClear={() => onClear()}
-            onValueChange={onSearchChange}
-          />
-          <div className="flex gap-3">
-            <Dropdown>
-              <DropdownTrigger className="hidden sm:flex">
-                <Button
-                  endContent={<IoChevronDown className="text-small" />}
-                  variant="flat"
+      <>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-end justify-between gap-3">
+            <Input
+              isClearable
+              className="w-full sm:max-w-[44%]"
+              placeholder="Buscar categorias"
+              startContent={<IoSearch size={20} />}
+              value={filterValue}
+              onClear={() => onClear()}
+              onValueChange={onSearchChange}
+            />
+            <div className="flex gap-3">
+              <Dropdown>
+                <DropdownTrigger className="hidden sm:flex">
+                  <Button
+                    endContent={<IoChevronDown className="text-small" />}
+                    variant="flat"
+                  >
+                    Columns
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu
+                  disallowEmptySelection
+                  aria-label="Table Columns"
+                  closeOnSelect={false}
+                  selectedKeys={visibleColumns}
+                  selectionMode="multiple"
+                  onSelectionChange={setVisibleColumns}
                 >
-                  Columns
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
+                  {columnsTable.map((column) => (
+                    <DropdownItem key={column.uid} className="capitalize">
+                      {capitalize(column.name)}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </Dropdown>
+              <Button
+                onPress={onOpen}
+                color="primary"
+                endContent={<IoAdd size={22} />}
               >
-                {columnsTable.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-            <Button
-              onPress={onOpen}
-              color="primary"
-              endContent={<IoAdd size={22} />}
-            >
-              Crear Nueva
-            </Button>
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-              <ModalContent>
-                {(onClose) => (
-                  <>
-                    <form
-                      onSubmit={handleSubmit(formSubmit)}
-                      className="flex w-full flex-col flex-wrap gap-4 md:flex-nowrap"
-                    >
-                      <ModalHeader className="flex flex-col gap-1">
-                        Crear Categoria
-                      </ModalHeader>
-                      <ModalBody>
-                        <Controller
-                          name="nombre"
-                          control={control}
-                          render={({ field }) => (
-                            <Input
-                              {...field}
-                              size="lg"
-                              labelPlacement="outside"
-                              label="Nombre"
-                              placeholder="Nombre de la categoria"
-                            />
-                          )}
-                        />
+                Crear Nueva
+              </Button>
+              {isOpen && (
+                <CustomModal
+                  isOpen={isOpen}
+                  onOpenChange={onOpenChange}
+                  category={category}
+                  setCategory={setCategory}
+                  onClose={onClose}
+                />
+              )}
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-small text-default-400">
+              Total {categories.length} categorias
+            </span>
 
-                        <Controller
-                          name="descripcion"
-                          control={control}
-                          render={({ field }) => (
-                            <Input
-                              {...field}
-                              size="lg"
-                              labelPlacement="outside"
-                              label="Descripcion"
-                              placeholder="Descripcion de la categoria"
-                            />
-                          )}
-                        />
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button type="submit" color="primary" onPress={onClose}>
-                          crear
-                        </Button>
-                      </ModalFooter>
-                    </form>
-                  </>
-                )}
-              </ModalContent>
-            </Modal>
+            <label className="flex items-center text-small text-default-400">
+              Categorias por pagina:
+              <select
+                className="bg-transparent text-small text-default-400 outline-none"
+                onChange={onRowsPerPageChange}
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+              </select>
+            </label>
           </div>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-small text-default-400">
-            Total {categories.length} categorias
-          </span>
-
-          <label className="flex items-center text-small text-default-400">
-            Categorias por pagina:
-            <select
-              className="bg-transparent text-small text-default-400 outline-none"
-              onChange={onRowsPerPageChange}
-            >
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-            </select>
-          </label>
-        </div>
-      </div>
+      </>
     );
   }, [
-    filterValue,
-    onSearchChange,
-    visibleColumns,
-    setVisibleColumns,
-    columnsTable,
-    onOpen,
-    isOpen,
-    onOpenChange,
     categories.length,
-    onRowsPerPageChange,
+    category,
+    columnsTable,
+    filterValue,
+    isOpen,
     onClear,
-    handleSubmit,
-    formSubmit,
-    control,
+    onClose,
+    onOpen,
+    onOpenChange,
+    onRowsPerPageChange,
+    onSearchChange,
+    setVisibleColumns,
+    visibleColumns,
   ]);
 
   const bottomContent = useMemo(() => {
