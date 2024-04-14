@@ -13,5 +13,5 @@ export class UnitsService {
       }
       throw new Error('Ocurrió un error al obtener las unidades');
     }
-  }
+  };
 }
