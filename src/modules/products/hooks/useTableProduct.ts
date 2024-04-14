@@ -1,4 +1,4 @@
-import { useQueryProduct } from '@/products/hooks';
+import { useQueryProducts } from '@/products/hooks';
 import { Product } from '@/products/interfaces';
 import { Selection, SortDescriptor } from '@nextui-org/react';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
@@ -11,6 +11,9 @@ export const columnsTable = [
   { name: 'STOCK', uid: 'stock', sortable: true },
   { name: 'STOCK MINIMO', uid: 'stock_minimo', sortable: true },
   { name: 'DESCRIPCION', uid: 'descripcion', sortable: true },
+  { name: 'CATEGORIA', uid: 'categoria', sortable: true },
+  { name: 'MARCA', uid: 'marca', sortable: true },
+  { name: 'UNIDAD', uid: 'unidad', sortable: true },
   { name: 'ACTIONS', uid: 'actions' },
 ];
 
@@ -22,11 +25,15 @@ const INITIAL_VISIBLE_COLUMNS = [
   'stock',
   'stock_minimo',
   'descripcion',
+  'categoria',
+  'marca',
+  'unidad',
   'actions',
 ];
 
 export const useTableProducts = () => {
-  const { data: products = [], isLoading } = useQueryProduct();
+  const { getProducts } = useQueryProducts();
+  const { data: products = [], isLoading } = getProducts;
 
   const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
@@ -70,10 +77,34 @@ export const useTableProducts = () => {
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = useMemo(() => {
+    const getAttributeValue = (product: Product) => {
+      switch (sortDescriptor.column) {
+        case 'categoria':
+          return product.categoria?.nombre;
+        case 'marca':
+          return product.marca?.nombre;
+        case 'unidad':
+          return product.unidad?.nombre;
+        default:
+          return product[sortDescriptor.column as keyof Product];
+      }
+    };
+
     return [...items].sort((a: Product, b: Product) => {
-      const first = a[sortDescriptor.column as keyof Product] as number;
-      const second = b[sortDescriptor.column as keyof Product] as number;
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
+      const first = getAttributeValue(a);
+      const second = getAttributeValue(b);
+      let cmp = 0;
+
+      if (first === undefined || second === undefined) {
+        return first === undefined ? 1 : -1;
+      }
+
+      if (typeof first === 'string' && typeof second === 'string') {
+        cmp = first.localeCompare(second); // Usamos localeCompare para la comparación de cadenas
+      } else {
+        cmp = first < second ? -1 : first > second ? 1 : 0;
+      }
+
       return sortDescriptor.direction === 'descending' ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
