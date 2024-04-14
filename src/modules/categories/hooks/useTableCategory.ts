@@ -1,5 +1,5 @@
-import { useQueryCategory } from '@/categories/hooks';
-import { CategoryRes } from '@/categories/interfaces';
+import { useQueryCategories } from '@/categories/hooks';
+import { Category } from '@/categories/interfaces';
 import { Selection, SortDescriptor } from '@nextui-org/react';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
 
@@ -13,7 +13,8 @@ export const columnsTable = [
 const INITIAL_VISIBLE_COLUMNS = ['id', 'nombre', 'descripcion', 'actions'];
 
 export const useTableCategory = () => {
-  const { data: categories = [], isLoading } = useQueryCategory();
+  const { getCategories } = useQueryCategories();
+  const { data: categories = [], isLoading } = getCategories;
 
   const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
@@ -57,9 +58,9 @@ export const useTableCategory = () => {
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = useMemo(() => {
-    return [...items].sort((a: CategoryRes, b: CategoryRes) => {
-      const first = a[sortDescriptor.column as keyof CategoryRes] as number;
-      const second = b[sortDescriptor.column as keyof CategoryRes] as number;
+    return [...items].sort((a: Category, b: Category) => {
+      const first = a[sortDescriptor.column as keyof Category] as number;
+      const second = b[sortDescriptor.column as keyof Category] as number;
       const cmp = first < second ? -1 : first > second ? 1 : 0;
       return sortDescriptor.direction === 'descending' ? -cmp : cmp;
     });

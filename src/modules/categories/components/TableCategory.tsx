@@ -23,14 +23,14 @@ import {
 } from 'react-icons/io5';
 
 import { CustomModal } from '@/categories/components';
-import { useDeleteCategory, useTableCategory } from '@/categories/hooks';
+import { useQueryCategories, useTableCategory } from '@/categories/hooks';
 import { Category } from '@/categories/interfaces';
 import { CategoryForm } from '@/categories/schemas';
 import { capitalize } from '@/shared/utils';
 import { Key, useCallback, useMemo, useState } from 'react';
 
 export const TableCategory = () => {
-  const deleteCategory = useDeleteCategory();
+  const { deleteCategory } = useQueryCategories();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const [category, setCategory] = useState<CategoryForm>({
@@ -101,9 +101,9 @@ export const TableCategory = () => {
                     Editar
                   </DropdownItem>
                   <DropdownItem
-                    onPress={() => {
-                      deleteCategory.mutate(category.id);
-                    }}
+                    onPress={() =>
+                      category.id && deleteCategory.mutate(category.id)
+                    }
                   >
                     Eliminar
                   </DropdownItem>

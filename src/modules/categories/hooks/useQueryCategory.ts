@@ -3,17 +3,14 @@ import { CategoriesService } from '@/categories/services';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-export const useQueryCategory = () => {
-  const { data, isLoading, isError } = useQuery({
+export const useQueryCategories = () => {
+  const queryClient = useQueryClient();
+
+  const getCategories = useQuery({
     queryKey: ['categories'],
     queryFn: CategoriesService.getCategories,
   });
 
-  return { data, isLoading, isError };
-};
-
-export const usePostCategory = () => {
-  const queryClient = useQueryClient();
   const postCategory = useMutation({
     mutationFn: (categoryForm: CategoryForm) =>
       CategoriesService.createCategory(categoryForm),
@@ -33,11 +30,6 @@ export const usePostCategory = () => {
     },
   });
 
-  return postCategory;
-};
-
-export const useDeleteCategory = () => {
-  const queryClient = useQueryClient();
   const deleteCategory = useMutation({
     mutationFn: (id: number) => CategoriesService.deleteCategory(id),
     onMutate: async () => {
@@ -55,11 +47,6 @@ export const useDeleteCategory = () => {
     },
   });
 
-  return deleteCategory;
-};
-
-export const useUpdateCategory = () => {
-  const queryClient = useQueryClient();
   const updateCategory = useMutation({
     mutationFn: (data: { id: number; category: CategoryForm }) =>
       CategoriesService.updateCategory(data.id, data.category),
@@ -78,5 +65,5 @@ export const useUpdateCategory = () => {
     },
   });
 
-  return updateCategory;
+  return { getCategories, postCategory, deleteCategory, updateCategory };
 };

@@ -8,7 +8,7 @@ import {
   ModalHeader,
 } from '@nextui-org/react';
 
-import { usePostCategory, useUpdateCategory } from '@/categories/hooks';
+import { useQueryCategories } from '@/categories/hooks';
 import { CategoryForm, CategorySchema } from '@/categories/schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect } from 'react';
@@ -21,8 +21,7 @@ export const CustomModal = ({
   onClose,
   onOpenChange,
 }: Props) => {
-  const postCategory = usePostCategory();
-  const updateCategory = useUpdateCategory();
+  const { postCategory, updateCategory } = useQueryCategories();
 
   const {
     control,
