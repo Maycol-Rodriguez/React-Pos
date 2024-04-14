@@ -26,17 +26,15 @@ import { CustomModal } from '@/categories/components';
 import { useQueryCategories, useTableCategory } from '@/categories/hooks';
 import { Category } from '@/categories/interfaces';
 import { CategoryForm } from '@/categories/schemas';
+import { initialCategory } from '@/shared/constants';
 import { capitalize } from '@/shared/utils';
 import { Key, useCallback, useMemo, useState } from 'react';
 
 export const TableCategory = () => {
+  const [category, setCategory] = useState<CategoryForm>(initialCategory);
+
   const { deleteCategory } = useQueryCategories();
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-
-  const [category, setCategory] = useState<CategoryForm>({
-    nombre: '',
-    descripcion: '',
-  });
 
   const {
     categories,
@@ -101,8 +99,9 @@ export const TableCategory = () => {
                     Editar
                   </DropdownItem>
                   <DropdownItem
-                    onPress={() =>
-                      category.id && deleteCategory.mutate(category.id)
+                    onPress={async () =>
+                      category.id &&
+                      (await deleteCategory.mutateAsync(category.id))
                     }
                   >
                     Eliminar
@@ -221,6 +220,7 @@ export const TableCategory = () => {
         </span>
         <Pagination
           isCompact
+          boundaries={2}
           showControls
           showShadow
           color="primary"
