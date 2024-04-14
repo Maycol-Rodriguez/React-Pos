@@ -10,6 +10,7 @@ import {
 
 import { useQueryCategories } from '@/categories/hooks';
 import { CategoryForm, CategorySchema } from '@/categories/schemas';
+import { initialCategory } from '@/shared/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
@@ -30,7 +31,7 @@ export const CustomModal = ({
     formState: { errors },
   } = useForm<CategoryForm>({
     resolver: zodResolver(CategorySchema),
-    defaultValues: { nombre: '', descripcion: '' },
+    defaultValues: initialCategory,
   });
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export const CustomModal = ({
         descripcion: category.descripcion,
       });
     } else {
-      reset({ nombre: '', descripcion: '' });
+      reset(initialCategory);
     }
   }, [category, reset]);
 
@@ -54,7 +55,7 @@ export const CustomModal = ({
       }
       reset();
       onClose();
-      setCategory({ nombre: '', descripcion: '' });
+      setCategory(initialCategory);
     },
     [onClose, postCategory, reset, setCategory, updateCategory],
   );
@@ -65,7 +66,7 @@ export const CustomModal = ({
       onOpenChange={onOpenChange}
       backdrop="opaque"
       onClose={() => {
-        setCategory({ nombre: '', descripcion: '' });
+        setCategory(initialCategory);
       }}
       classNames={{
         backdrop:
