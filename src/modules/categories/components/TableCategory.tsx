@@ -15,17 +15,13 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 
-import {
-  IoAdd,
-  IoChevronDown,
-  IoEllipsisVertical,
-  IoSearch,
-} from 'react-icons/io5';
+import { IoAdd, IoChevronDown, IoEllipsisVertical, IoSearch } from 'react-icons/io5';
 
 import { CustomModal } from '@/categories/components';
 import { useQueryCategories, useTableCategory } from '@/categories/hooks';
 import { Category } from '@/categories/interfaces';
 import { CategoryForm } from '@/categories/schemas';
+import { Loader } from '@/shared/components';
 import { initialCategory } from '@/shared/constants';
 import { capitalize } from '@/shared/utils';
 import { Key, useCallback, useMemo, useState } from 'react';
@@ -73,10 +69,7 @@ export const TableCategory = () => {
               <Dropdown aria-label="ver categoria">
                 <DropdownTrigger>
                   <Button isIconOnly size="sm" variant="light">
-                    <IoEllipsisVertical
-                      size={20}
-                      className="text-default-300"
-                    />
+                    <IoEllipsisVertical size={20} className="text-default-300" />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu aria-label="ver categoria">
@@ -99,9 +92,7 @@ export const TableCategory = () => {
                     Editar
                   </DropdownItem>
                   <DropdownItem
-                    onPress={() =>
-                      category.id && deleteCategory.mutate(category.id)
-                    }
+                    onPress={() => category.id && deleteCategory.mutate(category.id)}
                   >
                     Eliminar
                   </DropdownItem>
@@ -155,11 +146,7 @@ export const TableCategory = () => {
                   ))}
                 </DropdownMenu>
               </Dropdown>
-              <Button
-                onPress={onOpen}
-                color="primary"
-                endContent={<IoAdd size={22} />}
-              >
+              <Button onPress={onOpen} color="primary" endContent={<IoAdd size={22} />}>
                 Crear Nueva
               </Button>
               {isOpen && (
@@ -231,7 +218,7 @@ export const TableCategory = () => {
     );
   }, [selectedKeys, filteredItems.length, page, pages, setPage]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <Table
@@ -263,15 +250,10 @@ export const TableCategory = () => {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody
-        emptyContent={'No se encontraron categorias'}
-        items={sortedItems}
-      >
+      <TableBody emptyContent={'No se encontraron categorias'} items={sortedItems}>
         {(item) => (
           <TableRow key={item.id}>
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
+            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
           </TableRow>
         )}
       </TableBody>

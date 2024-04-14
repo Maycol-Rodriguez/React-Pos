@@ -14,15 +14,11 @@ import {
   TableRow,
 } from '@nextui-org/react';
 
-import {
-  IoAdd,
-  IoChevronDown,
-  IoEllipsisVertical,
-  IoSearch,
-} from 'react-icons/io5';
+import { IoAdd, IoChevronDown, IoEllipsisVertical, IoSearch } from 'react-icons/io5';
 
 import { useTableBrand } from '@/brand/hooks';
 import { Brand } from '@/brand/interfaces';
+import { Loader } from '@/shared/components';
 import { capitalize } from '@/shared/utils';
 import { Key, useCallback, useMemo } from 'react';
 
@@ -175,7 +171,7 @@ export const TableBrand = () => {
     );
   }, [selectedKeys, filteredItems.length, page, pages, setPage]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <Table
