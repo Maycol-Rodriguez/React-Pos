@@ -22,7 +22,6 @@ export const useQueryProducts = () => {
       toast.success(data);
     },
     onError: (error) => {
-      console.log(error);
       toast.error(error.message);
     },
     onSettled: () => {
@@ -30,5 +29,40 @@ export const useQueryProducts = () => {
     },
   });
 
-  return { getProducts, postProduct };
+  const deleteProduct = useMutation({
+    mutationFn: (id: number) => ProductsService.deleteProduct(id),
+    onMutate: async () => {
+      toast.loading('Eliminando producto...');
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success(data);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      toast.dismiss();
+    },
+  });
+
+  const updateProduct = useMutation({
+    mutationFn: (data: { id: number; product: ProductForm }) =>
+      ProductsService.updateProduct(data.id, data.product),
+    onMutate: async () => {
+      toast.loading('Actualizando producto...');
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success(data);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      toast.dismiss();
+    },
+  });
+
+  return { getProducts, postProduct, deleteProduct, updateProduct };
 };
