@@ -1,4 +1,5 @@
-import { Product } from '@/products/interfaces';
+import { Product, ProductResponse } from '@/products/interfaces';
+import { ProductForm } from '@/products/schemas';
 import { http } from '@/shared/config';
 import { isAxiosError } from 'axios';
 
@@ -12,6 +13,18 @@ export class ProductsService {
         throw new Error(error.response?.data.message);
       }
       throw new Error('Ocurrió un error al obtener las categorías');
+    }
+  };
+
+  static createProduct = async (product: ProductForm): Promise<string> => {
+    try {
+      const { data } = await http.post<ProductResponse>('/productos', product);
+      return data.mensaje;
+    } catch (error) {
+      if (isAxiosError(error)) {
+        throw new Error(error.response?.data.message);
+      }
+      throw new Error('Ocurrió un error al crear el producto');
     }
   };
 }
