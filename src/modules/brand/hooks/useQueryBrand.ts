@@ -1,11 +1,11 @@
 import { BrandsService } from '@/brand/services';
 import { useQuery } from '@tanstack/react-query';
 
-export const useQueryBrand = () => {
-  const { data, isLoading, isError } = useQuery({
+export const useQueryBrands = () => {
+  const getBrands = useQuery({
     queryKey: ['brands'],
     queryFn: BrandsService.getBrands,
   });
 
-  return { data, isLoading, isError };
+  return { getBrands };
 };
