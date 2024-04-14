@@ -1,4 +1,4 @@
-import { useQueryBrand } from '@/brand/hooks';
+import { useQueryBrands } from '@/brand/hooks';
 import { Brand } from '@/brand/interfaces';
 import { Selection, SortDescriptor } from '@nextui-org/react';
 import { ChangeEvent, useCallback, useMemo, useState } from 'react';
@@ -13,7 +13,8 @@ export const columnsTable = [
 const INITIAL_VISIBLE_COLUMNS = ['id', 'nombre', 'descripcion', 'actions'];
 
 export const useTableBrand = () => {
-  const { data: brands = [], isLoading } = useQueryBrand();
+  const { getBrands } = useQueryBrands();
+  const { data: brands = [], isLoading } = getBrands;
 
   const [filterValue, setFilterValue] = useState('');
   const [selectedKeys, setSelectedKeys] = useState<Selection>(new Set([]));
