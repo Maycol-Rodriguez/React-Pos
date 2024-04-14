@@ -99,9 +99,8 @@ export const TableCategory = () => {
                     Editar
                   </DropdownItem>
                   <DropdownItem
-                    onPress={async () =>
-                      category.id &&
-                      (await deleteCategory.mutateAsync(category.id))
+                    onPress={() =>
+                      category.id && deleteCategory.mutate(category.id)
                     }
                   >
                     Eliminar
