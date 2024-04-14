@@ -14,22 +14,11 @@ import { useQueryBrands } from '@/brand/hooks';
 import { useQueryCategories } from '@/categories/hooks';
 import { useQueryProducts } from '@/products/hooks';
 import { ProductForm, ProductSchema } from '@/products/schemas';
+import { initialProduct } from '@/shared/constants';
 import { useQueryUnits } from '@/units/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback, useEffect } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-
-const initialProductState: ProductForm = {
-  nombre: '',
-  codigo: '',
-  precio: 0,
-  stock: 0,
-  stock_minimo: 0,
-  categoria_id: 0,
-  marca_id: 0,
-  unidad_id: 0,
-  descripcion: '',
-};
 
 export const ModalProduct = ({
   product,
@@ -54,7 +43,7 @@ export const ModalProduct = ({
     formState: { errors },
   } = useForm<ProductForm>({
     resolver: zodResolver(ProductSchema),
-    defaultValues: initialProductState,
+    defaultValues: initialProduct,
   });
 
   useEffect(() => {
@@ -72,7 +61,7 @@ export const ModalProduct = ({
         unidad_id: product.unidad_id,
       });
     } else {
-      reset(initialProductState);
+      reset();
     }
   }, [product, reset]);
 
@@ -85,7 +74,7 @@ export const ModalProduct = ({
       }
       reset();
       onClose();
-      setProduct(initialProductState);
+      setProduct(initialProduct);
     },
     [onClose, postProduct, reset, setProduct],
   );
@@ -97,7 +86,7 @@ export const ModalProduct = ({
       backdrop="opaque"
       scrollBehavior={'outside'}
       onClose={() => {
-        setProduct(initialProductState);
+        setProduct(initialProduct);
       }}
       classNames={{
         backdrop:

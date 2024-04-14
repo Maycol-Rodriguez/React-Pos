@@ -12,6 +12,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  useDisclosure,
 } from '@nextui-org/react';
 
 import {
@@ -21,10 +22,13 @@ import {
   IoSearch,
 } from 'react-icons/io5';
 
+import { ModalProduct } from '@/products/components';
 import { useTableProducts } from '@/products/hooks';
 import { Product } from '@/products/interfaces';
+import { ProductForm } from '@/products/schemas';
+import { initialProduct } from '@/shared/constants';
 import { capitalize } from '@/shared/utils';
-import { Key, useCallback, useMemo } from 'react';
+import { Key, useCallback, useMemo, useState } from 'react';
 
 export const TableProduct = () => {
   const {
@@ -49,14 +53,26 @@ export const TableProduct = () => {
     visibleColumns,
   } = useTableProducts();
 
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+  const [product, setProduct] = useState<ProductForm>(initialProduct);
+
   const renderCell = useCallback((product: Product, columnKey: Key) => {
     const cellValue = product[columnKey as keyof Product];
 
     switch (columnKey) {
       case 'nombre':
-        return <span>{product.nombre}</span>;
+        return product.nombre;
       case 'descripcion':
         return product.descripcion;
+      case 'fecha_vencimiento':
+        return product.fecha_vencimiento?.toLocaleDateString();
+      case 'categoria':
+        return product.categoria.nombre;
+      case 'marca':
+        return product.marca.nombre;
+      case 'unidad':
+        return product.unidad.nombre; // Asumiendo que el valor nd
       case 'actions':
         return (
           <div className="relative flex items-center justify-end gap-2">
@@ -77,7 +93,7 @@ export const TableProduct = () => {
           </div>
         );
       default:
-        return cellValue;
+        return cellValue?.toString();
     }
   }, []);
 
@@ -119,9 +135,22 @@ export const TableProduct = () => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button color="primary" endContent={<IoAdd size={22} />}>
+            <Button
+              onPress={onOpen}
+              color="primary"
+              endContent={<IoAdd size={22} />}
+            >
               Crear Nueva
             </Button>
+            {isOpen && (
+              <ModalProduct
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                product={product}
+                setProduct={setProduct}
+                onClose={onClose}
+              />
+            )}
           </div>
         </div>
         <div className="flex items-center justify-between">
@@ -149,6 +178,11 @@ export const TableProduct = () => {
     visibleColumns,
     setVisibleColumns,
     columnsTable,
+    onOpen,
+    isOpen,
+    onOpenChange,
+    product,
+    onClose,
     products.length,
     onRowsPerPageChange,
     onClear,
@@ -164,6 +198,7 @@ export const TableProduct = () => {
         </span>
         <Pagination
           isCompact
+          boundaries={2}
           showControls
           showShadow
           color="primary"
