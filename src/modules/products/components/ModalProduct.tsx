@@ -29,8 +29,8 @@ export const ModalProduct = ({
 }: Props) => {
   const { getUnits } = useQueryUnits();
   const { getBrands } = useQueryBrands();
-  const { postProduct } = useQueryProducts();
   const { getCategories } = useQueryCategories();
+  const { postProduct, updateProduct } = useQueryProducts();
 
   const { data: units = [] } = getUnits;
   const { data: brands = [] } = getBrands;
@@ -42,8 +42,8 @@ export const ModalProduct = ({
     handleSubmit,
     formState: { errors },
   } = useForm<ProductForm>({
-    resolver: zodResolver(ProductSchema),
     defaultValues: initialProduct,
+    resolver: zodResolver(ProductSchema),
   });
 
   useEffect(() => {
@@ -68,7 +68,7 @@ export const ModalProduct = ({
   const formSubmit: SubmitHandler<ProductForm> = useCallback(
     async (data) => {
       if (data.id) {
-        // updateCategory.mutate({ id: data.id, product: data });
+        updateProduct.mutate({ id: data.id, product: data });
       } else {
         postProduct.mutate(data);
       }
@@ -76,7 +76,7 @@ export const ModalProduct = ({
       onClose();
       setProduct(initialProduct);
     },
-    [onClose, postProduct, reset, setProduct],
+    [onClose, postProduct, reset, setProduct, updateProduct],
   );
 
   return (
@@ -84,13 +84,12 @@ export const ModalProduct = ({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       backdrop="opaque"
-      scrollBehavior={'outside'}
+      scrollBehavior={'inside'}
       onClose={() => {
         setProduct(initialProduct);
       }}
       classNames={{
-        backdrop:
-          'bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20',
+        backdrop: 'bg-gradient-to-t from-zinc-900 to-zinc-900/10 backdrop-opacity-20',
       }}
     >
       <ModalContent>
@@ -110,13 +109,14 @@ export const ModalProduct = ({
                   <Input
                     {...field}
                     autoFocus
+                    label="Nombre"
+                    labelPlacement="inside"
+                    placeholder="Nombre del Producto"
+                    radius="sm"
+                    size="md"
+                    type="text"
                     color={errors.nombre ? 'danger' : 'default'}
                     errorMessage={errors.nombre?.message}
-                    label="Nombre"
-                    labelPlacement="outside"
-                    placeholder="Nombre del Producto"
-                    size="lg"
-                    radius="sm"
                     variant={errors.nombre ? 'bordered' : 'flat'}
                   />
                 )}
@@ -128,13 +128,14 @@ export const ModalProduct = ({
                 render={({ field }) => (
                   <Input
                     {...field}
+                    label="Codigo"
+                    labelPlacement="inside"
+                    placeholder="Codigo del Producto"
+                    radius="sm"
+                    size="md"
+                    type="text"
                     color={errors.codigo ? 'danger' : 'default'}
                     errorMessage={errors.codigo?.message}
-                    label="Codigo"
-                    labelPlacement="outside"
-                    placeholder="Codigo del Producto"
-                    size="lg"
-                    radius="sm"
                     variant={errors.codigo ? 'bordered' : 'flat'}
                   />
                 )}
@@ -147,17 +148,16 @@ export const ModalProduct = ({
                   render={({ field }) => (
                     <Input
                       {...field}
+                      label="Precio"
+                      labelPlacement="inside"
+                      placeholder="Precio del Producto"
+                      radius="sm"
+                      size="md"
+                      type="number"
                       color={errors.precio ? 'danger' : 'default'}
                       errorMessage={errors.precio?.message}
-                      label="Precio"
-                      labelPlacement="outside"
-                      placeholder="Precio del Producto"
-                      size="lg"
-                      variant={errors.precio ? 'bordered' : 'flat'}
-                      type="number"
-                      radius="sm"
                       value={field.value?.toString()}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      variant={errors.precio ? 'bordered' : 'flat'}
                     />
                   )}
                 />
@@ -168,17 +168,16 @@ export const ModalProduct = ({
                   render={({ field }) => (
                     <Input
                       {...field}
+                      label="Stock"
+                      labelPlacement="inside"
+                      placeholder="Stock del Producto"
+                      radius="sm"
+                      size="md"
+                      type="number"
                       color={errors.stock ? 'danger' : 'default'}
                       errorMessage={errors.stock?.message}
-                      label="Stock"
-                      labelPlacement="outside"
-                      placeholder="Stock del Producto"
-                      size="lg"
-                      variant={errors.stock ? 'bordered' : 'flat'}
-                      type="number"
-                      radius="sm"
                       value={field.value?.toString()}
-                      onChange={(e) => field.onChange(Number(+e.target.value))}
+                      variant={errors.stock ? 'bordered' : 'flat'}
                     />
                   )}
                 />
@@ -191,17 +190,16 @@ export const ModalProduct = ({
                   render={({ field }) => (
                     <Input
                       {...field}
+                      label="Stock Minimo"
+                      labelPlacement="inside"
+                      placeholder="Stock Minimo del Producto"
+                      radius="sm"
+                      size="md"
+                      type="number"
                       color={errors.stock_minimo ? 'danger' : 'default'}
                       errorMessage={errors.stock_minimo?.message}
-                      label="Stock Minimo"
-                      labelPlacement="outside"
-                      placeholder="Stock Minimo del Producto"
-                      size="lg"
-                      variant={errors.stock_minimo ? 'bordered' : 'flat'}
-                      type="number"
-                      radius="sm"
                       value={field.value?.toString()}
-                      onChange={(e) => field.onChange(Number(+e.target.value))}
+                      variant={errors.stock_minimo ? 'bordered' : 'flat'}
                     />
                   )}
                 />
@@ -212,25 +210,41 @@ export const ModalProduct = ({
                   render={({ field }) => (
                     <Select
                       {...field}
-                      size="lg"
-                      radius="sm"
-                      labelPlacement="outside"
                       label="Categoria"
-                      placeholder="Seleccione Categori."
-                      value={field.value?.toString()}
-                      onChange={(e) => field.onChange(Number(+e.target.value))}
+                      labelPlacement="inside"
+                      radius="sm"
+                      size="md"
                       color={errors.categoria_id ? 'danger' : 'default'}
                       errorMessage={errors.categoria_id?.message}
-                      variant={errors.stock_minimo ? 'bordered' : 'flat'}
+                      isDisabled={getCategories.isLoading}
+                      placeholder={
+                        getCategories.isLoading
+                          ? 'Cargando categorias..'
+                          : 'Seleccione Categoria'
+                      }
+                      variant={errors.categoria_id ? 'bordered' : 'flat'}
+                      onSelectionChange={(keys) =>
+                        field.onChange(Number(Array.from(keys)[0]))
+                      }
+                      selectedKeys={
+                        new Set(
+                          field.value && !getCategories.isLoading
+                            ? [field.value.toString()]
+                            : [],
+                        )
+                      }
                     >
-                      {categories.map((category, index) => (
-                        <SelectItem
-                          key={category.id ?? index}
-                          value={category.id}
-                        >
-                          {category.nombre}
+                      {!getCategories.isLoading ? (
+                        categories?.map((category) => (
+                          <SelectItem key={category.id!} value={category.id}>
+                            {category.nombre}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="" key={0}>
+                          Cargando...
                         </SelectItem>
-                      ))}
+                      )}
                     </Select>
                   )}
                 />
@@ -243,25 +257,39 @@ export const ModalProduct = ({
                   render={({ field }) => (
                     <Select
                       {...field}
-                      size="lg"
+                      label="Marca"
+                      labelPlacement="inside"
                       radius="sm"
+                      size="sm"
                       color={errors.marca_id ? 'danger' : 'default'}
                       errorMessage={errors.marca_id?.message}
-                      variant={errors.stock_minimo ? 'bordered' : 'flat'}
-                      labelPlacement="outside"
-                      label="Marca"
-                      placeholder="Seleccione Marca"
-                      value={field.value?.toString()}
-                      onChange={(e) => field.onChange(Number(+e.target.value))}
+                      isDisabled={getBrands.isLoading}
+                      placeholder={
+                        getBrands.isLoading ? 'Cargando marcas..' : 'Seleccione Marca'
+                      }
+                      variant={errors.marca_id ? 'bordered' : 'flat'}
+                      onSelectionChange={(keys) =>
+                        field.onChange(Number(Array.from(keys)[0]))
+                      }
+                      selectedKeys={
+                        new Set(
+                          field.value && !getBrands.isLoading
+                            ? [field.value.toString()]
+                            : [],
+                        )
+                      }
                     >
-                      {brands.map((category, index) => (
-                        <SelectItem
-                          key={category.id ?? index}
-                          value={category.id}
-                        >
-                          {category.nombre}
+                      {!getBrands.isLoading ? (
+                        brands?.map((brand) => (
+                          <SelectItem key={brand.id!} value={brand.id?.toString()}>
+                            {brand.nombre}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="" key={0}>
+                          Cargando...
                         </SelectItem>
-                      ))}
+                      )}
                     </Select>
                   )}
                 />
@@ -272,22 +300,39 @@ export const ModalProduct = ({
                   render={({ field }) => (
                     <Select
                       {...field}
-                      size="lg"
+                      label="Unidad"
+                      labelPlacement="inside"
                       radius="sm"
+                      size="sm"
                       color={errors.unidad_id ? 'danger' : 'default'}
                       errorMessage={errors.unidad_id?.message}
-                      variant={errors.stock_minimo ? 'bordered' : 'flat'}
-                      labelPlacement="outside"
-                      label="Unidad"
-                      placeholder="Seleccione Unidad"
-                      value={field.value?.toString()}
-                      onChange={(e) => field.onChange(Number(+e.target.value))}
+                      isDisabled={getUnits.isLoading}
+                      placeholder={
+                        getUnits.isLoading ? 'Cargando unidad..' : 'Seleccione Unidad'
+                      }
+                      variant={errors.unidad_id ? 'bordered' : 'flat'}
+                      onSelectionChange={(keys) =>
+                        field.onChange(Number(Array.from(keys)[0]))
+                      }
+                      selectedKeys={
+                        new Set(
+                          field.value && !getUnits.isLoading
+                            ? [field.value.toString()]
+                            : [],
+                        )
+                      }
                     >
-                      {units.map((unit, index) => (
-                        <SelectItem key={unit.id ?? index} value={unit.id}>
-                          {unit.nombre}
+                      {!getUnits.isLoading ? (
+                        units?.map((unit) => (
+                          <SelectItem key={unit.id!} value={unit.id}>
+                            {unit.nombre}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="" key={0}>
+                          Cargando...
                         </SelectItem>
-                      ))}
+                      )}
                     </Select>
                   )}
                 />
@@ -299,13 +344,13 @@ export const ModalProduct = ({
                 render={({ field }) => (
                   <Input
                     {...field}
+                    label="Descripcion"
+                    labelPlacement="inside"
+                    radius="sm"
+                    size="md"
                     color={errors.descripcion ? 'danger' : 'default'}
                     errorMessage={errors.descripcion?.message}
-                    label="Descripcion"
-                    labelPlacement="outside"
                     placeholder="Descripcion del Producto"
-                    size="lg"
-                    radius="sm"
                     variant={errors.descripcion ? 'bordered' : 'flat'}
                   />
                 )}
