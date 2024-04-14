@@ -15,17 +15,13 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 
-import {
-  IoAdd,
-  IoChevronDown,
-  IoEllipsisVertical,
-  IoSearch,
-} from 'react-icons/io5';
+import { IoAdd, IoChevronDown, IoEllipsisVertical, IoSearch } from 'react-icons/io5';
 
 import { ModalProduct } from '@/products/components';
-import { useTableProducts } from '@/products/hooks';
+import { useQueryProducts, useTableProducts } from '@/products/hooks';
 import { Product } from '@/products/interfaces';
 import { ProductForm } from '@/products/schemas';
+import { Loader } from '@/shared/components';
 import { initialProduct } from '@/shared/constants';
 import { capitalize } from '@/shared/utils';
 import { Key, useCallback, useMemo, useState } from 'react';
@@ -57,45 +53,75 @@ export const TableProduct = () => {
 
   const [product, setProduct] = useState<ProductForm>(initialProduct);
 
-  const renderCell = useCallback((product: Product, columnKey: Key) => {
-    const cellValue = product[columnKey as keyof Product];
+  const { deleteProduct } = useQueryProducts();
 
-    switch (columnKey) {
-      case 'nombre':
-        return product.nombre;
-      case 'descripcion':
-        return product.descripcion;
-      case 'fecha_vencimiento':
-        return product.fecha_vencimiento?.toLocaleDateString();
-      case 'categoria':
-        return product.categoria.nombre;
-      case 'marca':
-        return product.marca.nombre;
-      case 'unidad':
-        return product.unidad.nombre; // Asumiendo que el valor nd
-      case 'actions':
-        return (
-          <div className="relative flex items-center justify-end gap-2">
-            <Dropdown aria-label="ver producto">
-              <DropdownTrigger>
-                <Button isIconOnly size="sm" variant="light">
-                  <IoEllipsisVertical size={20} className="text-default-300" />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label="ver producto">
-                <DropdownItem onClick={() => console.log('Ver', product.id)}>
-                  ver
-                </DropdownItem>
-                <DropdownItem>Editar</DropdownItem>
-                <DropdownItem>Eliminar</DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </div>
-        );
-      default:
-        return cellValue?.toString();
-    }
-  }, []);
+  const renderCell = useCallback(
+    (product: Product, columnKey: Key) => {
+      const cellValue = product[columnKey as keyof Product];
+
+      switch (columnKey) {
+        case 'nombre':
+          return product.nombre;
+        case 'descripcion':
+          return product.descripcion;
+        case 'fecha_vencimiento':
+          return product.fecha_vencimiento?.toLocaleDateString();
+        case 'categoria':
+          return product.categoria.nombre;
+        case 'marca':
+          return product.marca.nombre;
+        case 'unidad':
+          return product.unidad.nombre; // Asumiendo que el valor nd
+        case 'actions':
+          return (
+            <div className="relative flex items-center justify-end gap-2">
+              <Dropdown aria-label="ver producto">
+                <DropdownTrigger>
+                  <Button isIconOnly size="sm" variant="light">
+                    <IoEllipsisVertical size={20} className="text-default-300" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu aria-label="ver producto">
+                  <DropdownItem onClick={() => console.log('Ver', product.id)}>
+                    ver
+                  </DropdownItem>
+                  <DropdownItem
+                    onPress={() => {
+                      if (!product.id) return;
+
+                      setProduct({
+                        id: product.id,
+                        nombre: product.nombre,
+                        codigo: product.codigo,
+                        descripcion: product.descripcion,
+                        precio: product.precio,
+                        stock: product.stock,
+                        stock_minimo: product.stock_minimo,
+                        categoria_id: product.categoria_id,
+                        marca_id: product.marca_id,
+                        unidad_id: product.unidad_id,
+                      });
+
+                      onOpen();
+                    }}
+                  >
+                    Editar
+                  </DropdownItem>
+                  <DropdownItem
+                    onPress={() => product.id && deleteProduct.mutate(product.id)}
+                  >
+                    Eliminar
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
+          );
+        default:
+          return cellValue?.toString();
+      }
+    },
+    [deleteProduct, onOpen, setProduct],
+  );
 
   const topContent = useMemo(() => {
     return (
@@ -135,11 +161,7 @@ export const TableProduct = () => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Button
-              onPress={onOpen}
-              color="primary"
-              endContent={<IoAdd size={22} />}
-            >
+            <Button onPress={onOpen} color="primary" endContent={<IoAdd size={22} />}>
               Crear Nueva
             </Button>
             {isOpen && (
@@ -210,7 +232,7 @@ export const TableProduct = () => {
     );
   }, [selectedKeys, filteredItems.length, page, pages, setPage]);
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
 
   return (
     <Table
@@ -242,10 +264,7 @@ export const TableProduct = () => {
           </TableColumn>
         )}
       </TableHeader>
-      <TableBody
-        emptyContent={'No se encontraron productos'}
-        items={sortedItems}
-      >
+      <TableBody emptyContent={'No se encontraron productos'} items={sortedItems}>
         {(item) => (
           <TableRow key={item.id}>
             {(columnKey) => {
