@@ -1,11 +1,34 @@
+import { ProductForm } from '@/products/schemas';
 import { ProductsService } from '@/products/services';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
-export const useQueryProduct = () => {
-  const { data, isLoading, isError } = useQuery({
+export const useQueryProducts = () => {
+  const queryClient = useQueryClient();
+
+  const getProducts = useQuery({
     queryKey: ['products'],
     queryFn: ProductsService.getProducts,
   });
 
-  return { data, isLoading, isError };
+  const postProduct = useMutation({
+    mutationFn: (product: ProductForm) =>
+      ProductsService.createProduct(product),
+    onMutate: async () => {
+      toast.loading('Creando producto...');
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success(data);
+    },
+    onError: (error) => {
+      console.log(error);
+      toast.error(error.message);
+    },
+    onSettled: () => {
+      toast.dismiss();
+    },
+  });
+
+  return { getProducts, postProduct };
 };
