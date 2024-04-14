@@ -12,7 +12,7 @@
       "@/categories/*": ["./src/modules/categories/*"],
       "@/products/*": ["./src/modules/products/*"],
       "@/shared/*": ["./src/modules/shared/*"],
-      "@/units/*": ["./src/modules/units/*"],
+      "@/units/*": ["./src/modules/units/*"]
     },
     /* Bundler mode */
     "moduleResolution": "bundler",
