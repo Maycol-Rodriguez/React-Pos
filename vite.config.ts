@@ -12,6 +12,7 @@ export default defineConfig({
       '@/categories': path.resolve(__dirname, './src/modules/categories'),
       '@/products': path.resolve(__dirname, './src/modules/products'),
       '@/shared': path.resolve(__dirname, './src/modules/shared'),
+      '@/units': path.resolve(__dirname, './src/modules/units'),
     },
   },
 });

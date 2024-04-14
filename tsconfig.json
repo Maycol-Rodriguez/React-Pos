@@ -11,7 +11,8 @@
       "@/brand/*": ["./src/modules/brand/*"],
       "@/categories/*": ["./src/modules/categories/*"],
       "@/products/*": ["./src/modules/products/*"],
-      "@/shared/*": ["./src/modules/shared/*"]
+      "@/shared/*": ["./src/modules/shared/*"],
+      "@/units/*": ["./src/modules/units/*"],
     },
     /* Bundler mode */
     "moduleResolution": "bundler",
