@@ -43,9 +43,15 @@ export class CategoriesService {
     }
   };
 
-  static updateCategory = async (id: number, category: CategoryForm): Promise<string> => {
+  static updateCategory = async (
+    id: number,
+    category: CategoryForm,
+  ): Promise<string> => {
     try {
-      const { data } = await http.put<CategoryResponse>(`/categorias/${id}`, category);
+      const { data } = await http.put<CategoryResponse>(
+        `/categorias/${id}`,
+        category,
+      );
       return data.mensaje;
     } catch (error) {
       if (isAxiosError(error)) {
@@ -53,5 +59,5 @@ export class CategoriesService {
       }
       throw new Error('Ocurrió un error al actualizar la categoría');
     }
-  }
+  };
 }
