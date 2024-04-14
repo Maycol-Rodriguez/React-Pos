@@ -1,16 +1,34 @@
 export interface Product {
-  id: number;
+  id?: number;
   nombre: string;
   codigo: string;
-  imagen?: string;
-  descripcion: string;
+  descripcion?: string;
   precio: string;
-  fecha_vencimiento?: string;
   stock: number;
   stock_minimo: number;
   categoria_id: number;
   marca_id: number;
-  created_at: string;
-  updated_at: string;
+  unidad_id: number;
+  imagen?: string;
+  created_at?: string;
+  updated_at?: string;
+  fecha_vencimiento?: Date;
+  estado: State;
+  categoria: Category;
+  marca: Category;
+  unidad: Category;
   actions?: string;
+}
+export interface ProductResponse {
+  mensaje: string;
+}
+
+interface Category {
+  id: number;
+  nombre: string;
+}
+
+enum State {
+  Activo = 'activo',
+  Inactivo = 'inactivo',
 }
